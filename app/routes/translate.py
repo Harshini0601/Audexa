@@ -1,12 +1,17 @@
-from fastapi import APIRouter, Request
+
+from fastapi import APIRouter, HTTPException, Request
+from pydantic import BaseModel
 from app.services.translate_engine import translate_text
 
-router = APIRouter(prefix="/translate", tags=["Translation"])
+router = APIRouter()
 
-@router.post("/")
-async def translate_route(request: Request):
-    data = await request.json()
-    text = data.get("text")
-    target_lang = data.get("lang", "hi")
-    translated = translate_text(text, target_lang)
-    return {"translated_text": translated}
+class TranslationRequest(BaseModel):
+    text: str
+    lang: str
+
+@router.post("/translate/")
+async def translate(req: TranslationRequest):
+    translated = translate_text(req.text, req.lang)
+    if translated == "Translation failed.":
+        raise HTTPException(status_code=500, detail="Translation service failed.")
+    return { "translated_text": translated }

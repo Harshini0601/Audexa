@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Audexa Reader</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="popup-container">
+    <h3>📖 Audexa Reader</h3>
+    
+    <div class="status-section">
+      <div id="current-text" class="current-text"></div>
+      <div class="progress-container">
+        <div class="progress-bar">
+          <div class="progress-fill"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="main-controls">
+      <button id="start" class="control-btn play-btn" title="Start Reading">▶ Play</button>
+      <button id="pause" class="control-btn pause-btn" title="Pause Reading">⏸ Pause</button>
+      <button id="resume" class="control-btn resume-btn" title="Resume Reading">⏯ Resume</button>
+      <button id="stop" class="control-btn stop-btn" title="Stop Reading">⏹ Stop</button>
+    </div>
+    
+    <div class="settings-section">
+      <div class="speed-control">
+        <label for="speed">Reading Speed:</label>
+        <select id="speed">
+          <option value="0.75">0.75x</option>
+          <option value="1.0" selected>1.0x</option>
+          <option value="1.25">1.25x</option>
+          <option value="1.5">1.5x</option>
+        </select>
+      </div>
+      
+      <div class="nav-controls">
+        <button id="backward" class="nav-btn back-btn" title="Previous Sentence">⏪ Back</button>
+        <button id="forward" class="nav-btn forward-btn" title="Next Sentence">⏩ Forward</button>
+      </div>
+    </div>
+  </div>
+  <script src="popup.js"></script>
+</body>
+</html>

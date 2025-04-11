@@ -1,65 +1,173 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Vocal Reader</title>
-  <link rel="stylesheet" href="/static/css/style.css" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Audexa</title>
+    
+    <link rel="stylesheet" href="{{ url_for('static', path='css/style.css') }}">
 </head>
 <body>
-  <div class="container">
-    <h1>🎧 Vocal Reader</h1>
+    <div class="container">
+        <header>
+            <h1>Audexa</h1>
+            <p>Harmonizing speech, text and translation - elevate How You Communicate.</p>
+        </header>
 
-    <textarea id="text" placeholder="Paste or type text here..."></textarea>
+        <div class="tabs">
+            <button class="tab-button active" onclick="openTab('textTab')">Text to Audio</button>
+            <button class="tab-button" onclick="openTab('pdfTab')">PDF to Audio</button>
+            <button class="tab-button" onclick="openTab('translateTab')">Translation</button>
+            <button class="tab-button" onclick="openTab('speechTab')">Speech to Text</button>
+            <button class="tab-button" onclick="openTab('extensionTab')">Browser Extension</button>
+            <button class="tab-button" onclick="openTab('chatTab')">Chatbot</button>
+        </div>
 
-    <div class="controls">
-      <button onclick="summarize()">📝 Summarize</button>
-      <button onclick="generateTTS()">🔊 Read Aloud</button>
-      <button onclick="translate()">🌍 Translate</button>
-      <button onclick="askQuestion()">🤖 Ask Question</button>
+        <!-- Text to Audio Tab -->
+        <div id="textTab" class="tab-content" style="display: block;">
+            <div class="input-section">
+                <label for="text">Enter Text:</label>
+                <textarea id="text" rows="10" placeholder="Type or paste your text here..."></textarea>
+                
+                <div class="button-group">
+                    <button onclick="generateTTS()">Convert to Audio</button>
+                    <button onclick="summarize()">Summarize</button>
+                </div>
+            </div>
+            
+            <div class="output-section">
+                <h3>Summary:</h3>
+                <div id="summary" class="output-box"></div>
+                
+                <audio id="audioPlayer" controls style="display: none; width: 100%; margin-top: 20px;"></audio>
+            </div>
+        </div>
+
+        <!-- PDF to Audio Tab -->
+        <div id="pdfTab" class="tab-content">
+            <form id="pdfForm" class="input-section">
+                <label for="pdfFile">Upload PDF:</label>
+                <input type="file" id="pdfFile" accept=".pdf" required>
+                
+                <button type="submit">Convert PDF to Audio</button>
+                
+                <audio id="audioPlayerPdf" controls style="display: none; width: 100%; margin-top: 20px;"></audio>
+                <div id="pdfTestResult" style="margin-top: 10px; color: #333;"></div>
+            </form>
+        </div>
+
+        <!-- Translation Tab -->
+        <div id="translateTab" class="tab-content">
+            <div class="input-section">
+                <label for="translateText">Enter Text to Translate:</label>
+                <textarea id="translateText" rows="8" placeholder="Type or paste text to translate..."></textarea>
+                
+                <div class="controls">
+                    <div class="control-group">
+                        <label for="targetLang">Target Language:</label>
+                        <select id="targetLang">
+                            <option value="es">Spanish</option>
+                            <option value="fr">French</option>
+                            <option value="de">German</option>
+                            <option value="it">Italian</option>
+                            <option value="pt">Portuguese</option>
+                            <option value="ru">Russian</option>
+                            <option value="ja">Japanese</option>
+                            <option value="zh-cn">Chinese (Simplified)</option>
+                            <option value="hi">Hindi</option>
+                            <option value="ar">Arabic</option>
+                            <option value="en">English</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <button onclick="translateText()">Translate</button>
+            </div>
+            
+            <div class="output-section">
+                <h3>Translation:</h3>
+                <div id="translatedText" class="output-box"></div>
+            </div>
+        </div>
+
+        <!-- Speech to Text Tab -->
+        <div id="speechTab" class="tab-content">
+            <div class="speech-to-text-container">
+                <div class="speech-controls">
+                    <button id="micButton" class="mic-button">
+                        <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                            <path d="M8 1a3 3 0 0 1 3 3v5a3 3 0 0 1-6 0V4a3 3 0 0 1 3-3zm0-1a4 4 0 0 0-4 4v5a4 4 0 0 0 8 0V4a4 4 0 0 0-4-4z"/>
+                            <path d="M10.5 11.5a.5.5 0 0 1-.5.5H6a.5.5 0 0 1 0-1h4a.5.5 0 0 1 .5.5z"/>
+                            <path d="M8 12.5a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-1 0v-2a.5.5 0 0 1 .5-.5z"/>
+                        </svg>
+                        Start Recording
+                    </button>
+                    <button id="clearButton" class="clear-button">Clear</button>
+                    <span id="statusIndicator" class="status-indicator">Ready</span>
+                </div>
+                <div class="transcript-container">
+                    <div id="finalTranscript" class="final-transcript"></div>
+                    <div id="interimTranscript" class="interim-transcript"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Browser Extension Tab -->
+        <div id="extensionTab" class="tab-content">
+            <div class="extension-container">
+                <div class="extension-info">
+                    <h2>Audexa Reader Browser Extension</h2>
+                    <p>Get instant access to Audexa Reader's features directly in your browser! Our Chrome extension allows you to:</p>
+                    <ul class="feature-list">
+                        <li>Convert any text on any webpage to speech</li>
+                        <li>Listen to articles while browsing</li>
+                        <li>Adjust reading speed and voice settings</li>
+                        <li>Get instant translations</li>
+                        <li>Access all Audexa features with just one click</li>
+                    </ul>
+
+                    <div class="installation-steps">
+                        <h3>How to Install</h3>
+                        <ol>
+                            <li>Download the extension package below</li>
+                            <li>Open Chrome and go to <code>chrome://extensions</code></li>
+                            <li>Enable "Developer mode" in the top right</li>
+                            <li>Click "Load unpacked" and select the downloaded folder</li>
+                            <li>The extension icon will appear in your browser toolbar</li>
+                        </ol>
+                    </div>
+
+                    <div class="download-section">
+                        <button onclick="downloadExtension()" class="download-button">
+                            <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+                                <path d="M10 12l-5-5 1.41-1.41L10 9.17l3.59-3.58L15 7l-5 5z"/>
+                                <path d="M10 18a8 8 0 100-16 8 8 0 000 16zm0 2C4.477 20 0 15.523 0 10S4.477 0 10 0s10 4.477 10 10-4.477 10-10 10z"/>
+                            </svg>
+                            Download Extension
+                        </button>
+                        <p class="version-info">Version 1.0.0 | Compatible with Chrome 88+</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Chatbot Tab -->
+        <div id="chatTab" class="tab-content">
+            <div class="input-section">
+                <label for="question">Ask a question:</label>
+                <textarea id="question" rows="3" placeholder="Type your question here..."></textarea>
+                
+                <button onclick="askQuestion()">Ask</button>
+            </div>
+            
+            <div class="output-section">
+                <h3>Answer:</h3>
+                <div id="answer" class="output-box"></div>
+            </div>
+        </div>
     </div>
 
-    <div class="options">
-      <label>Voice:
-        <select id="voice">
-          <option value="female">Female</option>
-          <option value="male">Male</option>
-        </select>
-      </label>
-
-      <label>Speed:
-        <select id="rate">
-          <option value="120">Slow</option>
-          <option value="150" selected>Normal</option>
-          <option value="180">Fast</option>
-        </select>
-      </label>
-
-      <label>Translate To:
-        <select id="lang">
-          <option value="hi">Hindi</option>
-          <option value="fr">French</option>
-          <option value="es">Spanish</option>
-        </select>
-      </label>
-    </div>
-
-    <input type="text" id="question" placeholder="Ask a question..." />
-
-    <div class="output">
-      <h3>📄 Summary</h3>
-      <div id="summary" class="box"></div>
-
-      <h3>🎯 Answer</h3>
-      <div id="answer" class="box"></div>
-
-      <h3>🌐 Translated</h3>
-      <div id="translated" class="box"></div>
-
-      <h3>🎵 Audio</h3>
-      <audio id="audioPlayer" controls></audio>
-    </div>
-  </div>
-
-  <script src="/static/js/app.js"></script>
+    <script src="{{ url_for('static', path='js/speech-to-text.js') }}"></script>
+    <script src="{{ url_for('static', path='js/app.js') }}"></script>
 </body>
 </html>

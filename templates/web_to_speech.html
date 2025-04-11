@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Web to Speech - Vocal Reader</title>
+    <link rel="stylesheet" href="{{ url_for('static', path='css/style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <nav class="main-nav">
+                <div class="logo-container">
+                    <img src="{{ url_for('static', path='images/voice-recognition.svg') }}" alt="Vocal Reader Logo" class="logo">
+                    <div class="title-container">
+                        <h1>Vocal Reader</h1>
+                    </div>
+                </div>
+                <div class="nav-links">
+                    <a href="{{ url_for('home') }}" class="nav-link">Home</a>
+                    <a href="{{ url_for('features') }}" class="nav-link">Features</a>
+                    <a href="{{ url_for('about') }}" class="nav-link">About</a>
+                    <a href="{{ url_for('feedback') }}" class="nav-link">Feedback</a>
+                    <div class="theme-toggle" onclick="toggleTheme()">
+                        <i class="fas fa-sun sun"></i>
+                        <i class="fas fa-moon moon"></i>
+                    </div>
+                </div>
+            </nav>
+        </header>
+
+        <main class="feature-content">
+            <h2>Web to Speech</h2>
+            <div class="input-section">
+                <label for="urlInput">Enter URL:</label>
+                <input type="url" id="urlInput" placeholder="https://example.com" required>
+                
+                <button onclick="fetchAndRead()">Read Web Page</button>
+                
+                <audio id="audioPlayerWeb" controls style="display: none; width: 100%; margin-top: 20px;"></audio>
+            </div>
+        </main>
+    </div>
+
+    <script src="{{ url_for('static', path='js/app.js') }}"></script>
+    <script>
+        // Theme functionality
+        const currentTheme = localStorage.getItem('theme') || 'light';
+        document.documentElement.setAttribute('data-theme', currentTheme);
+
+        function toggleTheme() {
+            const currentTheme = document.documentElement.getAttribute('data-theme');
+            const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+            
+            document.documentElement.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+        }
+    </script>
+</body>
+</html>

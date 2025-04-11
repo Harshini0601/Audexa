@@ -1,222 +1,88 @@
 
-
-# # from fastapi import APIRouter, Request
-# # import json
-# # from app.services.summarize_engine import summarize_text
-
-# # router = APIRouter(prefix="/summarize", tags=["Summarization"])
-
-# # @router.post("/")
-# # async def summarize_route(request: Request):
-# #     try:
-# #         # Read JSON data safely
-# #         raw_data = await request.body()
-        
-# #         # Decode JSON and remove escape characters
-# #         data = json.loads(raw_data.decode("utf-8").replace("\r", "").replace("\n", " ").replace("\t", " "))
-
-# #         # Extract text
-# #         text = data.get("text", "").strip()
-
-# #         if not text:
-# #             return {"error": "No text provided for summarization"}
-
-# #         # Summarize text
-# #         summary = summarize_text(text)
-        
-# #         return {"summary": summary}
-    
-# #     except json.JSONDecodeError as e:
-# #         return {"error": "Invalid JSON format", "details": str(e)}
-
-
-# working
-# from fastapi import FastAPI, APIRouter, Request, Form
-# from fastapi.responses import HTMLResponse
-# from fastapi.templating import Jinja2Templates
-# import json
-# from app.services.summarize_engine import summarize_text
-
-# app = FastAPI()
-# router = APIRouter(prefix="/summarize", tags=["Summarization"])
-
-# # Load HTML templates
-# templates = Jinja2Templates(directory="templates")
-
-# @app.get("/", response_class=HTMLResponse)
-# async def read_root(request: Request):
-#     return templates.TemplateResponse("index.html", {"request": request})
-
-# @router.post("/")
-# async def summarize_route(request: Request):
-#     try:
-#         raw_data = await request.body()
-#         data = json.loads(raw_data.decode("utf-8").replace("\r", "").replace("\n", " ").replace("\t", " "))
-#         text = data.get("text", "").strip()
-
-#         if not text:
-#             return {"error": "No text provided for summarization"}
-
-#         summary = summarize_text(text)
-#         return {"summary": summary}
-
-#     except json.JSONDecodeError as e:
-#         return {"error": "Invalid JSON format", "details": str(e)}
-
-# app.include_router(router)
-
-
-# # from fastapi import APIRouter, Request, HTTPException
-# # from pydantic import BaseModel
-# # import json
-# # import re
-# # from app.services.summarize_engine import summarize_text
-
-# # router = APIRouter(prefix="/summarize", tags=["Summarization"])
-
-# # class SummarizeRequest(BaseModel):
-# #     text: str
-
-# # def clean_text(text):
-# #     """Removes escape characters and control characters from input text."""
-# #     return re.sub(r"[\x00-\x1F\x7F]", " ", text).strip()
-
-# # @router.post("/")
-# # async def summarize_route(request: Request):
-# #     try:
-# #         # Read JSON data safely
-# #         raw_data = await request.body()
-# #         data = json.loads(raw_data.decode("utf-8"))
-
-# #         # Extract and clean text
-# #         text = data.get("text", "").strip()
-# #         cleaned_text = clean_text(text)
-
-# #         if not cleaned_text:
-# #             raise HTTPException(status_code=400, detail="Input text cannot be empty or contain only invalid characters")
-
-# #         # Summarize text
-# #         summary = summarize_text(cleaned_text)
-# #         if not summary:
-# #             raise HTTPException(status_code=500, detail="Summarization failed")
-
-# #         return {"summary": summary}
-
-# #     except json.JSONDecodeError as e:
-# #         raise HTTPException(status_code=400, detail=f"Invalid JSON format: {str(e)}")
-
-
-# from fastapi import FastAPI, HTTPException
-# from pydantic import BaseModel
-# import re
-# from app.services.summarize_engine import summarize_text  # Import your summarization function
-
-# app = FastAPI()
-
-# # ✅ Define a request model (this makes input appear in Swagger UI)
-# class SummarizeRequest(BaseModel):
-#     text: str
-
-# # ✅ Function to clean raw input text
-# def clean_text(text: str) -> str:
-#     # Remove control characters, excessive whitespace, and escape sequences
-#     cleaned_text = re.sub(r"[\x00-\x1F\x7F]", "", text)  
-#     cleaned_text = cleaned_text.replace("\r", " ").replace("\n", " ").replace("\t", " ")
-#     return cleaned_text.strip()
-
-# # ✅ API Route for Summarization
-# @app.post("/summarize/")
-# async def summarize(request: SummarizeRequest):
-#     cleaned_text = clean_text(request.text)
-
-#     if not cleaned_text:
-#         raise HTTPException(status_code=400, detail="Input text cannot be empty or contains invalid characters")
-
-#     summary = summarize_text(cleaned_text)  # Call your actual summarization function
-
-#     if not summary:
-#         raise HTTPException(status_code=500, detail="Summarization failed")
-
-#     return {"summary": summary}
-
-
-
-#ui code without escape characters
-# from fastapi import APIRouter, HTTPException
-# from pydantic import BaseModel
-# import re
-# from app.services.summarize_engine import summarize_text
-
-# router = APIRouter(prefix="/summarize", tags=["Summarization"])
-
-# class SummarizeRequest(BaseModel):
-#     text: str
-
-# def clean_text(text):
-#     return re.sub(r"[\x00-\x1F\x7F]", "", text)  # Remove control characters
-
-# @router.post("/")
-# async def summarize_route(request: SummarizeRequest):
-#     cleaned_text = clean_text(request.text)
-#     if not cleaned_text.strip():
-#         raise HTTPException(status_code=400, detail="Input text cannot be empty or contains invalid characters")
-
-#     summary = summarize_text(cleaned_text)
-#     if not summary:
-#         raise HTTPException(status_code=500, detail="Summarization failed")
-
-#     return {"summary": summary}
-
-from fastapi import FastAPI, APIRouter, Request, HTTPException
-from fastapi.responses import HTMLResponse
-from fastapi.templating import Jinja2Templates
-from app.services.summarize_engine import summarize_text
-import json
+from fastapi import APIRouter, HTTPException
+from pydantic import BaseModel, Field
 import re
+import logging
+from app.services.summarize_engine import summarize_text
 
-app = FastAPI()
+# Set up logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
 router = APIRouter(prefix="/summarize", tags=["Summarization"])
 
-templates = Jinja2Templates(directory="templates")
+class SummarizeRequest(BaseModel):
+    text: str
+    sentence_count: int = Field(default=3, ge=1, le=10, description="Number of sentences in summary")
+    detailed: bool = Field(default=False, description="Request a more detailed summary")
 
-@app.get("/", response_class=HTMLResponse)
-async def read_root(request: Request):
-    return templates.TemplateResponse("index.html", {"request": request})
-
-# 💡 Clean text function to sanitize input
-def clean_text(text: str) -> str:
-    text = text.strip()
-    text = re.sub(r"[\x00-\x1F\x7F]", "", text)  # Remove control characters
-    return text
+def clean_text(text):
+    # Remove control characters but keep newlines for paragraph structure
+    cleaned = re.sub(r"[\x00-\x08\x0B-\x0C\x0E-\x1F\x7F]", "", text)
+    # Replace multiple newlines with single newline for paragraph separation
+    cleaned = re.sub(r"\n+", "\n", cleaned)
+    # Replace newlines with spaces for processing
+    cleaned = re.sub(r"\n", " ", cleaned)
+    # Normalize whitespace
+    cleaned = re.sub(r"\s+", " ", cleaned).strip()
+    return cleaned
 
 @router.post("/")
-async def summarize_route(request: Request):
+async def summarize_route(request: SummarizeRequest):
     try:
-        # Decode and pre-clean raw request data
-        raw_data = await request.body()
-        data = json.loads(
-            raw_data.decode("utf-8")
-            .replace("\r", "")
-            .replace("\n", " ")
-            .replace("\t", " ")
-        )
-
-        text = data.get("text", "").strip()
-        cleaned_text = clean_text(text)
-
-        if not cleaned_text:
-            raise HTTPException(status_code=400, detail="Input text is empty or invalid after cleaning.")
-
-        summary = summarize_text(cleaned_text)
-
-        if not summary:
-            raise HTTPException(status_code=500, detail="Summarization failed")
-
+        # Clean the input text
+        cleaned_text = clean_text(request.text)
+        if not cleaned_text.strip():
+            raise HTTPException(status_code=400, detail="Input text cannot be empty or contains only invalid characters")
+        
+        # Log text length for debugging
+        word_count = len(cleaned_text.split())
+        logger.info(f"Summarizing text with {word_count} words, detailed={request.detailed}, sentence_count={request.sentence_count}")
+        
+        # More sophisticated length parameter calculation
+        # Base lengths adjusted for different text sizes
+        if word_count < 200:
+            base_min_length = 30
+            base_max_length = 80
+        elif word_count < 500:
+            base_min_length = 50
+            base_max_length = 150
+        elif word_count < 1000:
+            base_min_length = 70
+            base_max_length = 200
+        else:
+            base_min_length = 100
+            base_max_length = 300
+        
+        # If detailed summary requested, increase lengths significantly
+        if request.detailed:
+            base_min_length = int(base_min_length * 1.7)
+            base_max_length = int(base_max_length * 1.7)
+        
+        # Apply sentence count factor - each additional sentence increases length proportionally
+        sentence_factor = request.sentence_count / 3  # Normalized to default of 3 sentences
+        
+        # Apply sentence count scaling
+        min_length = max(30, int(base_min_length * sentence_factor))
+        max_length = max(80, int(base_max_length * sentence_factor))
+        
+        # Cap at reasonable limits
+        min_length = min(min_length, 250)
+        max_length = min(max_length, 500)
+        
+        logger.info(f"Final parameters: min_length={min_length}, max_length={max_length}")
+        
+        # Call the summarize engine with optimized parameters
+        summary = summarize_text(cleaned_text, max_length=max_length, min_length=min_length)
+        
+        if not summary or summary.strip() == "":
+            logger.warning(f"Empty summary returned for text with {word_count} words")
+            raise HTTPException(status_code=500, detail="Summarization produced an empty result")
+            
         return {"summary": summary}
-
-    except json.JSONDecodeError as e:
-        raise HTTPException(status_code=400, detail=f"Invalid JSON: {str(e)}")
-
-
-
-
+        
+    except Exception as e:
+        logger.error(f"Summarization error: {str(e)}")
+        if isinstance(e, HTTPException):
+            raise e
+        raise HTTPException(status_code=500, detail=f"Summarization failed: {str(e)}")

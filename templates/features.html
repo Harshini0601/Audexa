@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Features - Vocal Reader</title>
+    <link rel="stylesheet" href="static/css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <nav class="main-nav">
+                <div class="logo-container">
+                    <img src="static/images/voice-recognition.svg" alt="Vocal Reader Logo" class="logo">
+                    <div class="title-container">
+                        <h1>Vocal Reader</h1>
+                    </div>
+                </div>
+                <div class="nav-links">
+                    <a href="index.html" class="nav-link">Home</a>
+                    <a href="about.html" class="nav-link">About</a>
+                    <a href="feedback.html" class="nav-link">Feedback</a>
+                    <div class="theme-toggle" onclick="toggleTheme()">
+                        <i class="fas fa-sun sun"></i>
+                        <i class="fas fa-moon moon"></i>
+                    </div>
+                </div>
+            </nav>
+        </header>
+
+        <main class="features-section">
+            <h2 class="features-heading">Where Audio Meets InSights - Convert , Translate & Comprehend Effortlessly</h2>
+            
+            <div class="features-grid">
+                <div class="feature-button">
+                    <img src="static/images/text-to-audio.svg" alt="Text to Audio" class="feature-icon">
+                    <span>Text to Audio</span>
+                </div>
+                
+                <div class="feature-button">
+                    <img src="static/images/audio-to-text.svg" alt="Audio to Text" class="feature-icon">
+                    <span>Audio to Text</span>
+                </div>
+                
+                <div class="feature-button">
+                    <img src="static/images/pdf-to-audio.svg" alt="PDF to Audio" class="feature-icon">
+                    <span>PDF to Audio</span>
+                </div>
+                
+                <div class="feature-button">
+                    <img src="static/images/website-to-audio.svg" alt="Website to Audio" class="feature-icon">
+                    <span>Website to Audio</span>
+                </div>
+                
+                <div class="feature-button">
+                    <img src="static/images/text-translation.svg" alt="Text Translation" class="feature-icon">
+                    <span>Text Translation</span>
+                </div>
+                
+                <div class="feature-button">
+                    <img src="static/images/audio-translation.svg" alt="chatbot" class="feature-icon">
+                    <span>Chatbot</span>
+                </div>
+            </div>
+
+            
+        </main>
+    </div>
+
+    <script>
+        // Check for saved theme preference or use light theme by default
+        const currentTheme = localStorage.getItem('theme') || 'light';
+        document.documentElement.setAttribute('data-theme', currentTheme);
+
+        function toggleTheme() {
+            const currentTheme = document.documentElement.getAttribute('data-theme');
+            const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+            
+            document.documentElement.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+        }
+    </script>
+</body>
+</html>

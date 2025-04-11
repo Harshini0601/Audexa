@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Audexa Speech to Text</title>
+    <link rel="stylesheet" href="styles/speech-to-text.css">
+</head>
+<body>
+    <div class="speech-to-text-container">
+        <div class="speech-controls">
+            <button id="micButton" class="mic-button">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                    <path d="M8 1a3 3 0 0 1 3 3v5a3 3 0 0 1-6 0V4a3 3 0 0 1 3-3zm0-1a4 4 0 0 0-4 4v5a4 4 0 0 0 8 0V4a4 4 0 0 0-4-4z"/>
+                    <path d="M10.5 11.5a.5.5 0 0 1-.5.5H6a.5.5 0 0 1 0-1h4a.5.5 0 0 1 .5.5z"/>
+                    <path d="M8 12.5a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-1 0v-2a.5.5 0 0 1 .5-.5z"/>
+                </svg>
+                Start Recording
+            </button>
+            <button id="clearButton" class="clear-button">Clear</button>
+            <span id="statusIndicator" class="status-indicator">Ready</span>
+        </div>
+        <div class="transcript-container">
+            <div id="finalTranscript" class="final-transcript"></div>
+            <div id="interimTranscript" class="interim-transcript"></div>
+        </div>
+    </div>
+
+    <script src="scripts/speech-to-text.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const micButton = document.getElementById('micButton');
+            const clearButton = document.getElementById('clearButton');
+            const statusIndicator = document.getElementById('statusIndicator');
+            const finalTranscriptDiv = document.getElementById('finalTranscript');
+            const interimTranscriptDiv = document.getElementById('interimTranscript');
+
+            const speechToText = new SpeechToTextManager();
+
+            // Update UI based on recognition status
+            speechToText.onStatusChange = (status, error) => {
+                switch (status) {
+                    case 'listening':
+                        micButton.classList.add('listening');
+                        micButton.innerHTML = `
+                            <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                                <path d="M8 1a3 3 0 0 1 3 3v5a3 3 0 0 1-6 0V4a3 3 0 0 1 3-3zm0-1a4 4 0 0 0-4 4v5a4 4 0 0 0 8 0V4a4 4 0 0 0-4-4z"/>
+                                <path d="M10.5 11.5a.5.5 0 0 1-.5.5H6a.5.5 0 0 1 0-1h4a.5.5 0 0 1 .5.5z"/>
+                                <path d="M8 12.5a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-1 0v-2a.5.5 0 0 1 .5-.5z"/>
+                            </svg>
+                            Stop Recording
+                        `;
+                        statusIndicator.textContent = 'Listening...';
+                        break;
+                    case 'stopped':
+                        micButton.classList.remove('listening');
+                        micButton.innerHTML = `
+                            <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                                <path d="M8 1a3 3 0 0 1 3 3v5a3 3 0 0 1-6 0V4a3 3 0 0 1 3-3zm0-1a4 4 0 0 0-4 4v5a4 4 0 0 0 8 0V4a4 4 0 0 0-4-4z"/>
+                                <path d="M10.5 11.5a.5.5 0 0 1-.5.5H6a.5.5 0 0 1 0-1h4a.5.5 0 0 1 .5.5z"/>
+                                <path d="M8 12.5a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-1 0v-2a.5.5 0 0 1 .5-.5z"/>
+                            </svg>
+                            Start Recording
+                        `;
+                        statusIndicator.textContent = 'Ready';
+                        break;
+                    case 'error':
+                        micButton.classList.remove('listening');
+                        statusIndicator.textContent = `Error: ${error}`;
+                        break;
+                }
+            };
+
+            // Update transcript display
+            speechToText.onTranscriptUpdate = ({ final, interim }) => {
+                finalTranscriptDiv.textContent = final;
+                interimTranscriptDiv.textContent = interim;
+            };
+
+            // Button click handlers
+            micButton.addEventListener('click', () => {
+                speechToText.toggleListening();
+            });
+
+            clearButton.addEventListener('click', () => {
+                speechToText.clearTranscript();
+                finalTranscriptDiv.textContent = '';
+                interimTranscriptDiv.textContent = '';
+            });
+        });
+    </script>
+</body>
+</html> 
