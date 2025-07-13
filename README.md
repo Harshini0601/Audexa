@@ -20,8 +20,7 @@ Audexa is a voice-based AI-powered web application that helps users access menta
 
 - **Frontend**: HTML, CSS, JavaScript  
 - **Backend**: Python (Flask)  
-- **Voice Interaction**: Web Speech API (or similar)  
-- **AI Integration**: (Mention GPT/other APIs if used)
+- **AI Integration**: BART
 
 ---
 
