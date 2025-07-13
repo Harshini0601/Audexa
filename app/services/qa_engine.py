@@ -1,4 +1,3 @@
-
 # from transformers import pipeline
 
 # qa_pipeline = pipeline("question-answering")
@@ -13,12 +12,18 @@
 
 import openai
 import os
+from dotenv import load_dotenv
+
+load_dotenv()
 
 openai.api_key = os.getenv("OPENROUTER_API_KEY")
 openai.base_url = "https://openrouter.ai/api/v1"  # note: base_url not api_base in new version
 
+if not openai.api_key:
+    raise ValueError("OPENROUTER_API_KEY environment variable is not set. Please set it to your OpenRouter API key.")
+
 client = openai.OpenAI(
-    api_key="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",
+    api_key=openai.api_key,
     base_url=openai.base_url
 )
 

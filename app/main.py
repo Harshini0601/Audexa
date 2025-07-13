@@ -89,6 +89,18 @@ async def app_page(request: Request):
 async def home(request: Request):
     return templates.TemplateResponse("welcome.html", {"request": request})
 
+@app.get("/index", response_class=HTMLResponse)
+async def home(request: Request):
+    return templates.TemplateResponse("welcome.html", {"request": request})
+
+@app.get("/about", response_class=HTMLResponse)
+async def about(request: Request):
+    return templates.TemplateResponse("about.html", {"request": request})
+
+@app.get("/feedback", response_class=HTMLResponse)
+async def feedback(request: Request):
+    return templates.TemplateResponse("feedback.html", {"request": request})
+
 # Mount static files
 app.mount("/static", StaticFiles(directory="static"), name="static")
 

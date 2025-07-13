@@ -3,81 +3,301 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Feedback - Vocal Reader</title>
-    <link rel="stylesheet" href="static/css/style.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <title>Feedback - Audexa</title>
+    <link rel="stylesheet" href="{{ url_for('static', path='css/style.css') }}">
+    <style>
+      :root {
+        --primary-bg: #18191a;
+        --card-bg: #23272f;
+        --accent: #27b6ff;
+        --text: #fff;
+        --subtitle: #bbb;
+        --nav-bg: transparent;
+        --nav-link: #fff;
+        --nav-link-active: #27b6ff;
+        --toggle-bg: #23272f;
+        --toggle-thumb: #fff;
+        --toggle-icon: #27b6ff;
+      }
+      body.light-mode {
+        --primary-bg: #f5f7fa;
+        --card-bg: #fff;
+        --accent: #27b6ff;
+        --text: #23272f;
+        --subtitle: #333;
+        --nav-bg: #fff;
+        --nav-link: #23272f;
+        --nav-link-active: #27b6ff;
+        --toggle-bg: #e0e0e0;
+        --toggle-thumb: #23272f;
+        --toggle-icon: #f7c948;
+      }
+      body {
+        background: var(--primary-bg);
+        min-height: 100vh;
+        margin: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: background 0.4s;
+      }
+      .nav {
+        position: absolute;
+        top: 0; right: 0;
+        width: 100%;
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+        padding: 32px 60px 0 0;
+        z-index: 10;
+      }
+      .nav-links {
+        display: flex;
+        gap: 32px;
+        align-items: center;
+      }
+      .nav-link {
+        color: var(--nav-link);
+        text-decoration: none;
+        font-size: 1.1rem;
+        font-weight: 500;
+        transition: color 0.2s;
+        position: relative;
+      }
+      .nav-link:hover, .nav-link.active {
+        color: var(--nav-link-active);
+      }
+      .theme-toggle {
+        margin-left: 24px;
+        background: none;
+        border: none;
+        outline: none;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0;
+      }
+      .toggle-switch {
+        width: 52px;
+        height: 28px;
+        background: var(--toggle-bg);
+        border-radius: 16px;
+        position: relative;
+        display: flex;
+        align-items: center;
+        transition: background 0.3s;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+      }
+      .toggle-thumb {
+        position: absolute;
+        top: 3px;
+        left: 3px;
+        width: 22px;
+        height: 22px;
+        background: var(--toggle-thumb);
+        border-radius: 50%;
+        transition: left 0.3s, background 0.3s;
+        box-shadow: 0 1px 4px rgba(0,0,0,0.10);
+        z-index: 2;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .toggle-switch.light .toggle-thumb {
+        left: 27px;
+        background: var(--toggle-thumb);
+      }
+      .toggle-icon {
+        position: absolute;
+        width: 18px;
+        height: 18px;
+        top: 5px;
+        left: 8px;
+        z-index: 1;
+        fill: #f7c948;
+        opacity: 0;
+        transition: opacity 0.3s;
+      }
+      .toggle-switch.light .toggle-icon.sun {
+        opacity: 1;
+      }
+      .toggle-switch:not(.light) .toggle-icon.moon {
+        opacity: 1;
+        fill: #27b6ff;
+      }
+      .toggle-switch.light .toggle-icon.moon {
+        opacity: 0;
+      }
+      .toggle-switch:not(.light) .toggle-icon.sun {
+        opacity: 0;
+      }
+      .feedback-card {
+        background: var(--card-bg);
+        border-radius: 20px;
+        width: 900px;
+        max-width: 95vw;
+        margin: 40px auto;
+        padding: 60px 40px 80px 40px;
+        box-shadow: none;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        position: relative;
+        z-index: 1;
+      }
+      .feedback-header {
+        display: flex;
+        align-items: center;
+        margin-bottom: 40px;
+        width: 100%;
+      }
+      .feedback-header .icon {
+        margin-right: 12px;
+      }
+      .feedback-header .brand {
+        color: var(--accent);
+        font-size: 1.7rem;
+        font-weight: 600;
+        letter-spacing: 1px;
+      }
+      .section-heading {
+        color: var(--accent);
+        font-size: 2.2rem;
+        font-weight: 700;
+        text-align: center;
+        margin-bottom: 32px;
+      }
+      .feedback-form {
+        width: 100%;
+        max-width: 600px;
+        margin: 0 auto;
+        display: flex;
+        flex-direction: column;
+        gap: 24px;
+      }
+      .form-group {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+      }
+      .form-group label {
+        color: var(--accent);
+        font-size: 1.1rem;
+        font-weight: 500;
+      }
+      .form-group input,
+      .form-group textarea {
+        width: 100%;
+        padding: 12px;
+        border-radius: 6px;
+        border: 1px solid #333;
+        background: var(--card-bg);
+        color: var(--text);
+        font-size: 1rem;
+        transition: border 0.3s;
+      }
+      .form-group input:focus,
+      .form-group textarea:focus {
+        outline: none;
+        border-color: var(--accent);
+        box-shadow: 0 0 0 2px rgba(39,182,255,0.2);
+      }
+      .submit-button {
+        background: var(--accent);
+        color: #fff;
+        border: none;
+        border-radius: 30px;
+        padding: 14px 0;
+        font-size: 1.1rem;
+        font-weight: 600;
+        cursor: pointer;
+        margin-top: 10px;
+        transition: background 0.2s;
+        box-shadow: none;
+        text-decoration: none;
+        width: 100%;
+      }
+      .submit-button:hover {
+        background: #1a8ecb;
+      }
+      @media (max-width: 1000px) {
+        .feedback-card { width: 98vw; max-width: 98vw; }
+      }
+      @media (max-width: 700px) {
+        .feedback-card { padding: 30px 8px 40px 8px; width: 99vw; }
+        .section-heading { font-size: 1.1rem; }
+        .feedback-form { font-size: 0.95rem; }
+        .feedback-header .brand { font-size: 1.1rem; }
+      }
+    </style>
 </head>
 <body>
-    <!-- Loading Screen -->
-    <div class="loading-screen">
-        <img src="static/images/voice-recognition.svg" alt="Vocal Reader Logo" class="loading-logo">
-        <h1 class="loading-title">Vocal Reader</h1>
+  <nav class="nav">
+    <div class="nav-links">
+      <a href="/" class="nav-link">Home</a>
+      <a href="/about" class="nav-link">About</a>
+      <a href="/feedback" class="nav-link active">Feedback</a>
+      <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
+        <span class="toggle-switch" id="toggleSwitch">
+          <svg class="toggle-icon sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/><g><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></g></svg>
+          <svg class="toggle-icon moon" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 0 1 12.21 3a7 7 0 1 0 8.79 9.79z"/></svg>
+          <span class="toggle-thumb"></span>
+        </span>
+      </button>
     </div>
-
-    <div class="container">
-        <header>
-            <nav class="main-nav">
-                <div class="logo-container">
-                    <img src="static/images/voice-recognition.svg" alt="Vocal Reader Logo" class="logo">
-                    <div class="title-container">
-                        <h1>Vocal Reader</h1>
-                    </div>
-                </div>
-                <div class="nav-links">
-                    <a href="index.html" class="nav-link">Home</a>
-                    <a href="about.html" class="nav-link">About</a>
-                    <a href="feedback.html" class="nav-link">Feedback</a>
-                    <div class="theme-toggle" onclick="toggleTheme()">
-                        <i class="fas fa-sun sun"></i>
-                        <i class="fas fa-moon moon"></i>
-                    </div>
-                </div>
-            </nav>
-        </header>
-
-        <main class="feedback-section">
-            <h2 class="section-heading">Feedback</h2>
-            <form class="feedback-form">
-                <div class="form-group">
-                    <label for="name">Name</label>
-                    <input type="text" id="name" name="name" required>
-                </div>
-                <div class="form-group">
-                    <label for="email">Email</label>
-                    <input type="email" id="email" name="email" required>
-                </div>
-                <div class="form-group">
-                    <label for="message">Message</label>
-                    <textarea id="message" name="message" rows="5" required></textarea>
-                </div>
-                <button type="submit" class="submit-button">Submit Feedback</button>
-            </form>
-        </main>
+  </nav>
+  <div class="feedback-card">
+    <div class="feedback-header">
+      <span class="icon">
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="var(--accent)" xmlns="http://www.w3.org/2000/svg">
+          <path d="M12 15a3 3 0 0 0 3-3V7a3 3 0 0 0-6 0v5a3 3 0 0 0 3 3zm5-3a1 1 0 1 1 2 0 7 7 0 0 1-6 6.92V21h3a1 1 0 1 1 0 2H8a1 1 0 1 1 0-2h3v-2.08A7 7 0 0 1 4 12a1 1 0 1 1 2 0 5 5 0 0 0 10 0z"/>
+        </svg>
+      </span>
+      <span class="brand">Vocal Reader</span>
     </div>
-
-    <script>
-        // Loading screen functionality
-        window.addEventListener('load', function() {
-            const loadingScreen = document.querySelector('.loading-screen');
-            setTimeout(() => {
-                loadingScreen.style.opacity = '0';
-                setTimeout(() => {
-                    loadingScreen.style.display = 'none';
-                }, 500);
-            }, 2000);
-        });
-
-        // Theme functionality
-        const currentTheme = localStorage.getItem('theme') || 'light';
-        document.documentElement.setAttribute('data-theme', currentTheme);
-
-        function toggleTheme() {
-            const currentTheme = document.documentElement.getAttribute('data-theme');
-            const newTheme = currentTheme === 'light' ? 'dark' : 'light';
-            
-            document.documentElement.setAttribute('data-theme', newTheme);
-            localStorage.setItem('theme', newTheme);
-        }
-    </script>
+    <h2 class="section-heading">Feedback</h2>
+    <form class="feedback-form">
+      <div class="form-group">
+        <label for="name">Name</label>
+        <input type="text" id="name" name="name" required>
+      </div>
+      <div class="form-group">
+        <label for="email">Email</label>
+        <input type="email" id="email" name="email" required>
+      </div>
+      <div class="form-group">
+        <label for="message">Message</label>
+        <textarea id="message" name="message" rows="5" required></textarea>
+      </div>
+      <button type="submit" class="submit-button">Submit Feedback</button>
+    </form>
+  </div>
+  <script>
+    // Theme toggle
+    const themeToggle = document.getElementById('themeToggle');
+    const toggleSwitch = document.getElementById('toggleSwitch');
+    let isLight = false;
+    function setTheme(light) {
+      if (light) {
+        document.body.classList.add('light-mode');
+        toggleSwitch.classList.add('light');
+      } else {
+        document.body.classList.remove('light-mode');
+        toggleSwitch.classList.remove('light');
+      }
+    }
+    themeToggle.addEventListener('click', function() {
+      isLight = !isLight;
+      setTheme(isLight);
+      localStorage.setItem('audexa-theme', isLight ? 'light' : 'dark');
+    });
+    // On load, set theme from localStorage
+    if (localStorage.getItem('audexa-theme') === 'light') {
+      isLight = true;
+      setTheme(true);
+    }
+  </script>
 </body>
 </html>

@@ -2,6 +2,8 @@ from fastapi import APIRouter, Request
 from pydantic import BaseModel
 from typing import Optional
 from app.services.qa_engine import answer_question
+import os
+import openai
 
 router = APIRouter(prefix="/chatbot", tags=["Q&A Chatbot"])
 

@@ -4,47 +4,321 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Welcome to Audexa</title>
-    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-    <link href="/static/css/welcome.css" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', path='css/style.css') }}">
+    <style>
+      :root {
+        --primary-bg: #18191a;
+        --card-bg: #23272f;
+        --accent: #27b6ff;
+        --text: #fff;
+        --subtitle: #bbb;
+        --nav-bg: transparent;
+        --nav-link: #fff;
+        --nav-link-active: #27b6ff;
+        --toggle-bg: #23272f;
+        --toggle-thumb: #fff;
+        --toggle-icon: #27b6ff;
+      }
+      body.light-mode {
+        --primary-bg: #f5f7fa;
+        --card-bg: #fff;
+        --accent: #27b6ff;
+        --text: #23272f;
+        --subtitle: #333;
+        --nav-bg: #fff;
+        --nav-link: #23272f;
+        --nav-link-active: #27b6ff;
+        --toggle-bg: #e0e0e0;
+        --toggle-thumb: #23272f;
+        --toggle-icon: #f7c948;
+      }
+      body {
+        background: var(--primary-bg);
+        min-height: 100vh;
+        margin: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: background 0.4s;
+      }
+      .nav {
+        position: absolute;
+        top: 0; right: 0;
+        width: 100%;
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+        padding: 32px 60px 0 0;
+        z-index: 10;
+      }
+      .nav-links {
+        display: flex;
+        gap: 32px;
+        align-items: center;
+      }
+      .nav-link {
+        color: var(--nav-link);
+        text-decoration: none;
+        font-size: 1.1rem;
+        font-weight: 500;
+        transition: color 0.2s;
+        position: relative;
+      }
+      .nav-link:hover, .nav-link.active {
+        color: var(--nav-link-active);
+      }
+      .theme-toggle {
+        margin-left: 24px;
+        background: none;
+        border: none;
+        outline: none;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0;
+      }
+      .toggle-switch {
+        width: 52px;
+        height: 28px;
+        background: var(--toggle-bg);
+        border-radius: 16px;
+        position: relative;
+        display: flex;
+        align-items: center;
+        transition: background 0.3s;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+      }
+      .toggle-thumb {
+        position: absolute;
+        top: 3px;
+        left: 3px;
+        width: 22px;
+        height: 22px;
+        background: var(--toggle-thumb);
+        border-radius: 50%;
+        transition: left 0.3s, background 0.3s;
+        box-shadow: 0 1px 4px rgba(0,0,0,0.10);
+        z-index: 2;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .toggle-switch.light .toggle-thumb {
+        left: 27px;
+        background: var(--toggle-thumb);
+      }
+      .toggle-icon {
+        position: absolute;
+        width: 18px;
+        height: 18px;
+        top: 5px;
+        left: 8px;
+        z-index: 1;
+        fill: #f7c948;
+        opacity: 0;
+        transition: opacity 0.3s;
+      }
+      .toggle-switch.light .toggle-icon.sun {
+        opacity: 1;
+      }
+      .toggle-switch:not(.light) .toggle-icon.moon {
+        opacity: 1;
+        fill: #27b6ff;
+      }
+      .toggle-switch.light .toggle-icon.moon {
+        opacity: 0;
+      }
+      .toggle-switch:not(.light) .toggle-icon.sun {
+        opacity: 0;
+      }
+      .welcome-card {
+        background: var(--card-bg);
+        border-radius: 20px;
+        width: 900px;
+        max-width: 95vw;
+        margin: 40px auto;
+        padding: 60px 40px 80px 40px;
+        box-shadow: none;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        position: relative;
+        z-index: 1;
+      }
+      .logo-anim {
+        opacity: 0;
+        transform: scale(0.7) rotate(-180deg);
+        transition: opacity 0.7s, transform 0.7s cubic-bezier(.68,-0.55,.27,1.55);
+        margin-bottom: 0.5em;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .logo-anim.visible {
+        opacity: 1;
+        transform: scale(1) rotate(0deg);
+      }
+      .brand-anim {
+        opacity: 0;
+        transform: translateY(-40px);
+        color: var(--accent);
+        font-size: 2.2rem;
+        font-weight: 700;
+        letter-spacing: 2px;
+        margin-bottom: 1.5em;
+        transition: opacity 0.7s 0.5s, transform 0.7s 0.5s;
+        text-align: center;
+      }
+      .brand-anim.visible {
+        opacity: 1;
+        transform: translateY(0);
+      }
+      .main-heading-anim, .subtitle-anim, .getstarted-anim {
+        opacity: 0;
+        transform: translateY(-40px);
+        transition: opacity 0.7s, transform 0.7s;
+        width: 100%;
+        text-align: center;
+      }
+      .main-heading-anim.visible, .subtitle-anim.visible, .getstarted-anim.visible {
+        opacity: 1;
+        transform: translateY(0);
+      }
+      .main-heading-anim {
+        color: var(--accent);
+        font-size: 2rem;
+        font-weight: 700;
+        margin-bottom: 24px;
+        margin-top: 10px;
+        line-height: 1.2;
+      }
+      .subtitle-anim {
+        color: var(--text);
+        font-size: 1.15rem;
+        margin-bottom: 40px;
+        font-weight: 400;
+      }
+      .getstarted-anim {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin-top: 0;
+      }
+      .get-started-btn {
+        background: var(--accent);
+        color: #fff;
+        border: none;
+        border-radius: 30px;
+        padding: 18px 48px;
+        font-size: 1.25rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background 0.2s;
+        box-shadow: none;
+        text-decoration: none;
+        display: inline-block;
+        margin: 0 auto;
+      }
+      .get-started-btn:hover {
+        background: #1a8ecb;
+      }
+      @media (max-width: 1000px) {
+        .welcome-card { width: 98vw; max-width: 98vw; }
+      }
+      @media (max-width: 700px) {
+        .welcome-card { padding: 30px 8px 40px 8px; width: 99vw; }
+        .main-heading-anim { font-size: 1.1rem; }
+        .subtitle-anim { font-size: 0.95rem; }
+        .brand-anim { font-size: 1.3rem; }
+      }
+    </style>
 </head>
-<body class="min-h-screen gradient-bg">
-    <div class="container mx-auto px-4 py-16">
-        <!-- Header Section -->
-        <header class="text-center mb-16">
-            <h1 class="text-6xl font-bold text-white mb-4">Audexa</h1>
-            <p class="text-xl text-white opacity-90">Where Audio meets Insights - Convert Translate Comprehend Effortlessly</p>
-        </header>
-
-        <!-- Features Section -->
-        <section class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
-            <!-- Audio Processing Feature -->
-            <article class="feature-card card-hover">
-                <img src="/static/images/audio-wave.svg" alt="Audio Processing" class="feature-icon">
-                <h3 class="feature-title">Audio Processing</h3>
-                <p class="feature-description">Experience advanced audio processing capabilities powered by cutting-edge AI technology.</p>
-            </article>
-
-            <!-- Language Translation Feature -->
-            <article class="feature-card card-hover">
-                <img src="/static/images/translation.svg" alt="Language Translation" class="feature-icon">
-                <h3 class="feature-title">Language Translation</h3>
-                <p class="feature-description">Break language barriers with our seamless translation features.</p>
-            </article>
-
-            <!-- Voice Recognition Feature -->
-            <article class="feature-card card-hover">
-                <img src="/static/images/voice-recognition.svg" alt="Voice Recognition" class="feature-icon">
-                <h3 class="feature-title">Voice Recognition</h3>
-                <p class="feature-description">Advanced voice recognition technology for accurate audio processing.</p>
-            </article>
-        </section>
-
-        <!-- Call to Action -->
-        <footer class="text-center">
-            <a href="/app" class="btn-get-started">
-                Get Started
-            </a>
-        </footer>
+<body>
+  <nav class="nav">
+    <div class="nav-links">
+      <a href="/" class="nav-link active">Home</a>
+      <a href="/about" class="nav-link">About</a>
+      <a href="/feedback" class="nav-link">Feedback</a>
+      <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
+        <span class="toggle-switch" id="toggleSwitch">
+          <svg class="toggle-icon sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/><g><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></g></svg>
+          <svg class="toggle-icon moon" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 0 1 12.21 3a7 7 0 1 0 8.79 9.79z"/></svg>
+          <span class="toggle-thumb"></span>
+        </span>
+      </button>
     </div>
+  </nav>
+  <div class="welcome-card">
+    <div class="logo-anim" id="logoAnim">
+      <svg width="64" height="64" viewBox="0 0 24 24" fill="var(--accent)" xmlns="http://www.w3.org/2000/svg">
+        <path d="M12 15a3 3 0 0 0 3-3V7a3 3 0 0 0-6 0v5a3 3 0 0 0 3 3zm5-3a1 1 0 1 1 2 0 7 7 0 0 1-6 6.92V21h3a1 1 0 1 1 0 2H8a1 1 0 1 1 0-2h3v-2.08A7 7 0 0 1 4 12a1 1 0 1 1 2 0 5 5 0 0 0 10 0z"/>
+      </svg>
+    </div>
+    <div class="brand-anim" id="brandAnim">Audexa</div>
+    <div class="main-heading-anim" id="mainHeadingAnim">
+      Transcending Barriers : Transform Audio , Text & Language with<br>Seamless Precision
+    </div>
+    <div class="subtitle-anim" id="subtitleAnim">
+      Harmonizing Speech , Text & Translation - Elevate How You Communicate
+    </div>
+    <div class="getstarted-anim" id="getStartedAnim">
+      <a href="/app" class="get-started-btn">Get Started</a>
+    </div>
+  </div>
+  <script>
+    // Animation sequence
+    document.addEventListener("DOMContentLoaded", function() {
+      const logo = document.getElementById('logoAnim');
+      const brand = document.getElementById('brandAnim');
+      const mainHeading = document.getElementById('mainHeadingAnim');
+      const subtitle = document.getElementById('subtitleAnim');
+      const getStarted = document.getElementById('getStartedAnim');
+      logo.classList.remove('visible');
+      brand.classList.remove('visible');
+      mainHeading.classList.remove('visible');
+      subtitle.classList.remove('visible');
+      getStarted.classList.remove('visible');
+      setTimeout(() => {
+        logo.classList.add('visible');
+        setTimeout(() => {
+          brand.classList.add('visible');
+          setTimeout(() => {
+            mainHeading.classList.add('visible');
+            setTimeout(() => {
+              subtitle.classList.add('visible');
+              setTimeout(() => {
+                getStarted.classList.add('visible');
+              }, 400);
+            }, 400);
+          }, 400);
+        }, 600);
+      }, 200);
+    });
+
+    // Theme toggle
+    const themeToggle = document.getElementById('themeToggle');
+    const toggleSwitch = document.getElementById('toggleSwitch');
+    let isLight = false;
+    function setTheme(light) {
+      if (light) {
+        document.body.classList.add('light-mode');
+        toggleSwitch.classList.add('light');
+      } else {
+        document.body.classList.remove('light-mode');
+        toggleSwitch.classList.remove('light');
+      }
+    }
+    themeToggle.addEventListener('click', function() {
+      isLight = !isLight;
+      setTheme(isLight);
+      localStorage.setItem('audexa-theme', isLight ? 'light' : 'dark');
+    });
+    // On load, set theme from localStorage
+    if (localStorage.getItem('audexa-theme') === 'light') {
+      isLight = true;
+      setTheme(true);
+    }
+  </script>
 </body>
 </html>

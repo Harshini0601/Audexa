@@ -13,6 +13,22 @@ function cleanText(input) {
 document.addEventListener("DOMContentLoaded", function() {
   console.log("DOM fully loaded");
   
+  // Landing animation sequence
+  const icon = document.getElementById('landingIcon');
+  const title = document.getElementById('landingTitle');
+  const mainContent = document.getElementById('mainContent');
+
+  if (icon && title && mainContent) {
+    icon.classList.add('visible');
+    setTimeout(() => {
+      title.classList.add('visible');
+      setTimeout(() => {
+        mainContent.classList.add('visible');
+        mainContent.classList.remove('hidden');
+      }, 700); // after title
+    }, 700); // after icon
+  }
+  
   // Set first tab as active by default
   openTab("textTab");
   
