@@ -102,7 +102,7 @@ async def feedback(request: Request):
     return templates.TemplateResponse("feedback.html", {"request": request})
 
 # Mount static files
-app.mount("/static", StaticFiles(directory="static"), name="static")
+#app.mount("/static", StaticFiles(directory="static"), name="static")
 
 # Ensure temp directories exist
 TEMP_AUDIO_DIR = Path("temp_audio")
@@ -139,10 +139,3 @@ async def download_extension():
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
         
-from fastapi import FastAPI
-
-app = FastAPI()
-
-@app.get("/")
-def home():
-    return {"message": "Audexa backend running 🚀"}
