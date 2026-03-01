@@ -138,3 +138,11 @@ async def download_extension():
         )
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+        
+from fastapi import FastAPI
+
+app = FastAPI()
+
+@app.get("/")
+def home():
+    return {"message": "Audexa backend running 🚀"}
